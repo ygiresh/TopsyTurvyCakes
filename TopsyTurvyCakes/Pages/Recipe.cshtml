@@ -1,7 +1,5 @@
 ﻿@page "{Id}"
-@using TopsyTurvyCakes.Models
 @{
-    Layout = "_Layout";
     var id = long.Parse((string)RouteData.Values["Id"]);
     var recipesService = new RecipesService();
     var recipe = await recipesService.FindAsync(id);
