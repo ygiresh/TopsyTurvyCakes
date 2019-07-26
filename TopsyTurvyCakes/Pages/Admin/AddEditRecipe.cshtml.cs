@@ -10,6 +10,7 @@ namespace TopsyTurvyCakes.Pages.Admin
 {
     public class AddEditRecipeModel : PageModel
     {
+        private readonly IRecipesService recipesService;
         [FromRoute]
         public long? Id { get; set; }
 
@@ -18,12 +19,32 @@ namespace TopsyTurvyCakes.Pages.Admin
             get { return Id == null; }
         }
 
+        [BindProperty]
         public Recipe Recipe { get; set; }
 
-        public void OnGet()
+
+        public AddEditRecipeModel(IRecipesService recipesService)
         {
+            this.recipesService = recipesService;
+        }
 
+        public async Task OnGetAsync()
+        {
+            Recipe = await recipesService.FindAsync(Id.GetValueOrDefault())
+                ?? new Recipe();
+        }
 
+        public async Task<IActionResult> OnPostAsync()
+        {
+            Recipe.Id = Id.GetValueOrDefault();
+            await recipesService.SaveAsync(Recipe);
+            return RedirectToPage("/Recipe", new{ id = Id });
+        }
+
+        public async Task<IActionResult> OnPostDelete()
+        {
+            await recipesService.DeleteAsync(Id.Value);
+            return RedirectToPage("/Index");
         }
     }
 }
