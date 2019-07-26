@@ -22,6 +22,8 @@ namespace TopsyTurvyCakes.Pages.Admin
         [BindProperty]
         public Recipe Recipe { get; set; }
 
+        [BindProperty]
+        public Microsoft.AspNetCore.Http.IFormFile Image { get; set; }
 
         public AddEditRecipeModel(IRecipesService recipesService)
         {
@@ -36,7 +38,24 @@ namespace TopsyTurvyCakes.Pages.Admin
 
         public async Task<IActionResult> OnPostAsync()
         {
-            Recipe.Id = Id.GetValueOrDefault();
+
+           var recipe = await recipesService.FindAsync(Id.GetValueOrDefault())
+               ?? new Recipe();
+
+            recipe.Name = Recipe.Name;
+            recipe.Description = Recipe.Description;
+            recipe.Ingredients = Recipe.Ingredients;
+            recipe.Directions = Recipe.Directions;
+
+            if(Image != null)
+                using(var stream = new System.IO.MemoryStream())
+                {
+                    await Image.CopyToAsync(stream);
+                    recipe.Image = stream.ToArray();
+                    recipe.ImageContentType = Image.ContentType;
+
+                }
+
             await recipesService.SaveAsync(Recipe);
             return RedirectToPage("/Recipe", new{ id = Id });
         }
