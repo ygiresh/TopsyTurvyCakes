@@ -5,10 +5,8 @@
     var id = long.Parse((string)RouteData.Values["Id"]);
     var recipesService = new RecipesService();
     var recipe = await recipesService.FindAsync(id);
+    ViewData["Title"] = recipe.Name;
 }
-        <div class="row">
-            <h2 class="title">@recipe.Name</h2>
-        </div>
 
         <div class="row recipe">
             <div class="col-md-8">
